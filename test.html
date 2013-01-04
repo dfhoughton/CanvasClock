@@ -7,7 +7,8 @@
 <script type="text/javascript">
 	window.onload = draw;
 	function draw() {
-		var clock = new dfh.clock(document.getElementById("test"), {
+		var canvas = document.getElementById("test");
+		var clock = new dfh.Clock(canvas, {
 			fill : "rgba(255, 255, 255, 0)",
 			axis : "white",
 		});
@@ -25,7 +26,6 @@ body {
 </style>
 </head>
 <body>
-	<canvas id="test">Damn. Canvas not
-	supported.</canvas>
+	<canvas id="test">Damn. Canvas not supported.</canvas>
 </body>
 </html>

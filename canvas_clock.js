@@ -1,11 +1,19 @@
-// create dfh
+// create dfh namespace
 var dfh = dfh || {};
 
 /**
- * @author houghton
- * 
+ * Global defaults. These set the default color of the face and the features on
+ * the face.
  */
-dfh.clock = function(canvas, params) {
+dfh.clockDefaults = {
+	color : 'black',
+	fill : 'white',
+};
+
+/**
+ * Constructor function for clocks. 
+ */
+dfh.Clock = function(canvas, params) {
 	if (canvas === undefined)
 		throw new Error("cannot create clock: canvas undefined");
 	if (canvas.getContext === undefined)
@@ -13,8 +21,8 @@ dfh.clock = function(canvas, params) {
 
 	// configure
 	params = params || {};
-	params.color = params.color || 'black';
-	params.fill = params.fill || 'white';
+	params.color = params.color || dfh.clockDefaults.color;
+	params.fill = params.fill || dfh.clockDefaults.fill;
 	params.hours = params.is24 ? 24 : 12;
 	params.hour = params.hour || params.color;
 	params.minute = params.minut || params.color;
@@ -51,13 +59,18 @@ dfh.clock = function(canvas, params) {
 	this._start();
 };
 
-dfh.clock.prototype = {
+dfh.Clock.prototype = {
+	// the last moment displayed
+	time : function() {
+		return this.date;
+	},
+
 	_start : function() {
 		var obj = this;
 		obj._draw();
 		setInterval(function() {
 			obj._draw();
-		}, 500);
+		}, 1000);
 	},
 
 	_draw : function() {
@@ -77,6 +90,7 @@ dfh.clock.prototype = {
 
 	_show_time : function() {
 		var d = new Date();
+		this.date = d;
 		var h = this._hour(d), m = this._minute(d), s = this._second(d);
 		this._radial(-this.length.hour[0], this.length.hour[1],
 				this.width.hour, this.params.hour, h);
