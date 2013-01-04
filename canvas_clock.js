@@ -1,3 +1,9 @@
+/*
+ * © 2013, David F. Houghton
+ * 
+ * licensed under LGPL v3: http://www.gnu.org/copyleft/lesser.html
+ */
+
 // create dfh namespace
 var dfh = dfh || {};
 
@@ -14,6 +20,7 @@ dfh.clockDefaults = {
  * Constructor function for clocks.
  */
 dfh.Clock = function(canvas, params) {
+	// validate parameters
 	if (canvas === undefined)
 		throw new Error("cannot create clock: canvas undefined");
 	if (canvas.getContext === undefined)
@@ -71,6 +78,7 @@ dfh.Clock.prototype = {
 		return this.date;
 	},
 
+	// draw the initial face and start the update schedule
 	_start : function() {
 		var obj = this;
 		obj._draw();
@@ -79,6 +87,8 @@ dfh.Clock.prototype = {
 		}, 1000);
 	},
 
+	// draws various elements of the clock face in an order such that they're
+	// properly layered
 	_draw : function() {
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this._face();
@@ -86,6 +96,7 @@ dfh.Clock.prototype = {
 		this._axis();
 	},
 
+	// draws axis the clock's hands turn on
 	_axis : function() {
 		this.context.beginPath();
 		this.context.arc(this.center.x, this.center.y, this.axis, 0,
@@ -94,6 +105,7 @@ dfh.Clock.prototype = {
 		this.context.fill();
 	},
 
+	// draws hands of clock
 	_show_time : function() {
 		var d = new Date();
 		this.date = d;
@@ -106,6 +118,7 @@ dfh.Clock.prototype = {
 				this.width.second, this.params.second, s);
 	},
 
+	// draws face of clock -- ticks for hours and minutes
 	_face : function() {
 		// circle
 		this.context.lineWidth = 2;
@@ -141,6 +154,8 @@ dfh.Clock.prototype = {
 		this.context.stroke();
 	},
 
+	// converts from polar to cartesian co-ordinates, where the pole is the axis
+	// of the clock face
 	_fromCenter : function(length, angle) {
 		var theta = Math.PI * (angle * 2 - .5);
 		var x = length * Math.cos(theta), y = length * Math.sin(theta);

@@ -5,8 +5,7 @@
 <title>CanvasClockTest</title>
 <script type="text/javascript" src="canvas_clock.js"></script>
 <script type="text/javascript">
-	window.onload = draw;
-	function draw() {
+	window.onload = function() {
 		var canvas = document.getElementById("test");
 		new dfh.Clock(canvas);
 		canvas = document.getElementById("test1");
