@@ -11,13 +11,16 @@ dfh.clockDefaults = {
 };
 
 /**
- * Constructor function for clocks. 
+ * Constructor function for clocks.
  */
 dfh.Clock = function(canvas, params) {
 	if (canvas === undefined)
 		throw new Error("cannot create clock: canvas undefined");
 	if (canvas.getContext === undefined)
 		throw new Error("browser does not support canvas element");
+	var dim = Math.min(canvas.width, canvas.height);
+	if (dim < 55)
+		throw new Error("canvas too small; minimum of width and height is 55");
 
 	// configure
 	params = params || {};
@@ -25,16 +28,19 @@ dfh.Clock = function(canvas, params) {
 	params.fill = params.fill || dfh.clockDefaults.fill;
 	params.hours = params.is24 ? 24 : 12;
 	params.hour = params.hour || params.color;
-	params.minute = params.minut || params.color;
+	params.minute = params.minute || params.color;
 	params.second = params.second || params.color;
 	params.face = params.face || params.color;
 	params.axis = params.axis || params.fill;
+	params.ticks = params.ticks || {};
+	params.ticks.minute = params.ticks.minute || params.color;
+	params.ticks.hour = params.ticks.hour || params.color;
 
 	this.params = params;
 	this.canvas = canvas;
 	this.secondsInDay = 60 * 60 * params.hours;
 	this.context = canvas.getContext('2d');
-	this.radius = Math.min(canvas.width, canvas.height) / 2 - 2;
+	this.radius = dim / 2 - 2;
 	this.center = {
 		x : canvas.width / 2,
 		y : canvas.height / 2,
@@ -111,12 +117,13 @@ dfh.Clock.prototype = {
 		this.context.fill();
 		this.context.stroke();
 		// ticks
-		var length = this.radius / 10;
-		for ( var i = 0; i < this.params.hours; i++)
-			this._radial(length, 0, 3, this.params.face, i / this.params.hours);
-		length /= 2;
+		var length = Math.max(2, this.radius / 20);
 		for ( var i = 0; i < 60; i++)
-			this._radial(length, 0, 1, this.params.face, i / 60);
+			this._radial(length, 0, 1, this.params.ticks.minute, i / 60);
+		length *= 2;
+		for ( var i = 0; i < this.params.hours; i++)
+			this._radial(length, 0, 3, this.params.ticks.hour, i
+					/ this.params.hours);
 	},
 
 	// draws a line segment along a line intersecting the center of the clock

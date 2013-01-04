@@ -8,24 +8,55 @@
 	window.onload = draw;
 	function draw() {
 		var canvas = document.getElementById("test");
-		var clock = new dfh.Clock(canvas, {
+		new dfh.Clock(canvas);
+		canvas = document.getElementById("test1");
+		new dfh.Clock(canvas, {
 			fill : "rgba(255, 255, 255, 0)",
 			axis : "white",
+		});
+		canvas = document.getElementById("test2");
+		new dfh.Clock(canvas);
+		canvas = document.getElementById("test3");
+		new dfh.Clock(canvas);
+		canvas = document.getElementById("test4");
+		new dfh.Clock(canvas, {
+			fill : 'white',
+			axis : 'green',
+			hour : 'blue',
+			minute : 'red',
+			second : 'orange',
+			face : 'purple',
+			ticks : {
+				minute : 'green',
+				hour : 'red',
+			},
 		});
 	}
 </script>
 <style type="text/css">
 body {
 	margin: 10%;
+	background-color: yellow;
 }
 
-#test {
+.clock {
 	display: table;
 	margin: auto;
 }
 </style>
 </head>
 <body>
-	<canvas id="test">Damn. Canvas not supported.</canvas>
+	<h2>default clock</h2>
+	<canvas id="test" class="clock">Damn. Canvas not supported.</canvas>
+	<h2>default canvas size; transparent face</h2>
+	<canvas id="test1" class="clock">Damn. Canvas not supported.</canvas>
+	<h2>big canvas</h2>
+	<canvas id="test2" class="clock" height="400" width="400">Damn.
+	Canvas not supported.</canvas>
+	<h2>tiny canvas</h2>
+	<canvas id="test3" class="clock" height="55" width="55">Damn.
+	Canvas not supported.</canvas>
+	<h2>default canvas size; rainbow features</h2>
+	<canvas id="test4" class="clock">Damn. Canvas not supported.</canvas>
 </body>
 </html>
