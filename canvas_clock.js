@@ -14,7 +14,13 @@ var dfh = dfh || {};
 dfh.clockDefaults = {
 	color : 'black',
 	fill : 'white',
-	eventColor : function(content) {
+	eventColor : function(event, clock) {
+		if (event.start.getTime() < clock.startSecond)
+			return 'rgba(0, 0, 255, 0.5)';
+		if (event.end === undefined)
+			return 'rgba(0, 255, 0, 0.5)';
+		if (event.end.getTime() > clock.endSecond)
+			return 'rgba(0, 125, 125, 0.5)';
 		return 'rgba(255, 0, 0, 0.5)';
 	},
 };
@@ -46,7 +52,9 @@ dfh.Clock = function(canvas, params) {
 	params.ticks.minute = params.ticks.minute || params.color;
 	params.ticks.hour = params.ticks.hour || params.color;
 	if (params.eventColor) {
-		this.eventColor = params.eventColor;
+		this.ecolor = params.eventColor;
+	} else {
+		this.ecolor = dfh.clockDefaults.eventColor;
 	}
 
 	this.params = params;
@@ -215,7 +223,7 @@ dfh.Clock.prototype = {
 				if (angles) {
 					angles[0] = this._fix_angle(angles[0]);
 					angles[1] = this._fix_angle(angles[1]);
-					this._wedge(angles[0], angles[1], this.color(e.content));
+					this._wedge(angles[0], angles[1], this.color(e));
 					drawn = true;
 				}
 			}
@@ -249,19 +257,25 @@ dfh.Clock.prototype = {
 	 *            fill color
 	 */
 	_wedge : function(a1, a2, color) {
-		this.context.beginPath();
-		this.context.arc(this.center.x, this.center.y, this.radius, a1, a2,
-				false);
-		this.context.fillStyle = color;
-		this.context.fill();
-		var p1 = this._radianFromCenter(this.radius, a1), p2 = this
-				._radianFromCenter(this.radius, a2);
-		this.context.beginPath();
-		this.context.moveTo(this.center.x, this.center.y);
-		this.context.lineTo(p1[0], p1[1]);
-		this.context.lineTo(p2[0], p2[1]);
-		this.context.lineTo(this.center.x, this.center.y);
-		this.context.fill();
+		if (a2 - a1 > Math.PI) {
+			var a3 = a1 + Math.PI;
+			this._wedge(a1, a3, color);
+			this._wedge(a3, a2, color);
+		} else {
+			this.context.beginPath();
+			this.context.arc(this.center.x, this.center.y, this.radius, a1, a2,
+					false);
+			this.context.fillStyle = color;
+			this.context.fill();
+			var p1 = this._radianFromCenter(this.radius, a1), p2 = this
+					._radianFromCenter(this.radius, a2);
+			this.context.beginPath();
+			this.context.moveTo(this.center.x, this.center.y);
+			this.context.lineTo(p1[0], p1[1]);
+			this.context.lineTo(p2[0], p2[1]);
+			this.context.lineTo(this.center.x, this.center.y);
+			this.context.fill();
+		}
 	},
 
 	/**
@@ -328,10 +342,10 @@ dfh.Clock.prototype = {
 	 *            the content attribute of a dfh.Event
 	 * @returns a color to paint a wedge of the clock face
 	 */
-	color : function(content) {
-		if (this.eventColor)
-			return this.eventColor(content);
-		return dfh.clockDefaults.eventColor(content);
+	color : function(event) {
+		if (!(event instanceof dfh.Event))
+			Error("not an event");
+		return this.ecolor(event, this);
 	},
 
 	/**
@@ -405,8 +419,13 @@ dfh.Event.prototype = {
 		if (this.displayable(clock)) {
 			var d1 = clock.startTime(), d2 = clock.endTime();
 			var start = d1.getTime() < this.start.getTime() ? this.start : d1;
-			var end = this.end == undefined
-					|| d2.getTime() < this.end.getTime() ? d2 : this.end;
+			var end;
+			if (this.end === undefined)
+				end = clock.date;
+			else if (d2.getTime() < this.end.getTime())
+				end = d2;
+			else
+				end = this.end;
 			return [ clock._hour(start), clock._hour(end) ];
 		} else {
 			return undefined;
@@ -433,9 +452,12 @@ dfh.Event.prototype = {
 	 *          on the current clock
 	 */
 	displayable : function(clock) {
+		var s1 = this.start.getTime();
+		if (s1 > clock.date.getTime())
+			return false;
 		if (this.end === undefined)
 			return true;
-		var s1 = this.start.getTime(), s2 = this.end.getTime();
-		return s2 > clock.startSecond && s1 < clock.endSecond;
+		var s2 = this.end.getTime();
+		return s2 > clock.startSecond;
 	},
 };

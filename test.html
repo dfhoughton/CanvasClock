@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>CanvasClockTest</title>
+<title>CanvasClock Test</title>
 <script type="text/javascript" src="canvas_clock.js"></script>
 <script type="text/javascript">
 	window.onload = function() {
@@ -32,16 +32,28 @@
 		});
 		canvas = document.getElementById("test5");
 		var clock = new dfh.Clock(canvas);
-		var d1 = clock.startTime();
+		var sd = clock.startTime();
+		// event that starts before the earliest time on the clock
+		var d1 = new Date();
+		d1.setHours(sd.getHours(), 0, 0, 0);
+		if (sd.getDate() > 1)
+			d1.setDate(sd.getDate() - 1);
+		else
+			d1.setFullYear(sd.getFullYear() - 1, 1, 1);
 		var d2 = new Date();
 		d2.setHours(d1.getHours() + 1, 0, 0, 0);
 		var e1 = new dfh.Event(d1, d2);
+		// small event in the middle of the clock
 		var d3 = new Date();
 		d3.setHours(d2.getHours(), 30, 0, 0);
 		var d4 = new Date();
 		d4.setHours(d3.getHours(), 45, 0, 0);
 		var e2 = new dfh.Event(d3, d4);
-		clock.add(e1, e2);
+		// ongoing event
+		var d5 = new Date();
+		d5.setHours(d4.getHours(), 50, 0, 0);
+		var e3 = new dfh.Event(d5);
+		clock.add(e1, e2, e3);
 	}
 </script>
 <style type="text/css">
