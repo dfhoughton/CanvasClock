@@ -54,6 +54,28 @@
 		d5.setHours(d4.getHours(), 50, 0, 0);
 		var e3 = new dfh.Event(d5);
 		clock.add(e1, e2, e3);
+		canvas = document.getElementById("test6");
+		clock = new dfh.Clock(canvas, {
+			noHands : true
+		});
+		clock.add(e1, e2, e3);
+		canvas = document.getElementById("test7");
+		clock = new dfh.Clock(canvas, {
+			noSecond : true
+		});
+		clock.add(e1, e2, e3);
+		canvas = document.getElementById("test8");
+		clock = new dfh.Clock(canvas, {
+			noHands : true,
+			noTicks : true,
+		});
+		clock.add(e1, e2, e3);
+		canvas = document.getElementById("test9");
+		clock = new dfh.Clock(canvas, {
+			noSecond : true,
+			noMinuteTicks : true,
+		});
+		clock.add(e1, e2, e3);
 	}
 </script>
 <style type="text/css">
@@ -83,5 +105,13 @@ canvas {
 	<canvas id="test4">Damn. Canvas not supported.</canvas>
 	<h2>clock showing events</h2>
 	<canvas id="test5">Damn. Canvas not supported.</canvas>
+	<h2>clock showing events without hands</h2>
+	<canvas id="test6">Damn. Canvas not supported.</canvas>
+	<h2>clock showing events without second hand</h2>
+	<canvas id="test7">Damn. Canvas not supported.</canvas>
+	<h2>clock showing events without hands or ticks</h2>
+	<canvas id="test8">Damn. Canvas not supported.</canvas>
+	<h2>clock showing events without second hand or minute ticks</h2>
+	<canvas id="test9">Damn. Canvas not supported.</canvas>
 </body>
 </html>

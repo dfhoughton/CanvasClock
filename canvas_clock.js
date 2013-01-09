@@ -40,27 +40,40 @@ dfh.Clock = function(canvas, params) {
 
 	// configure
 	params = params || {};
-	params.color = params.color || dfh.clockDefaults.color;
-	params.fill = params.fill || dfh.clockDefaults.fill;
-	params.hours = params.is24 ? 24 : 12;
-	params.hour = params.hour || params.color;
-	params.minute = params.minute || params.color;
-	params.second = params.second || params.color;
-	params.face = params.face || params.color;
-	params.axis = params.axis || params.fill;
-	params.ticks = params.ticks || {};
-	params.ticks.minute = params.ticks.minute || params.color;
-	params.ticks.hour = params.ticks.hour || params.color;
+	var p = {};
+	p.color = params.color || dfh.clockDefaults.color;
+	p.fill = params.fill || dfh.clockDefaults.fill;
+	p.hours = params.is24 ? 24 : 12;
+	p.show = {
+		hands : !(params.noHands || (params.noHour && params.noMinute && params.noSecond)),
+		hour : !params.noHour,
+		minute : !params.noMinute,
+		second : !params.noSecond,
+		ticks : !(params.noTicks || (params.noMinuteTicks && params.noHourTicks)),
+		minuteTicks : !params.noMinuteTicks,
+		hourTicks : !params.noHourTicks,
+	};
+	p.hour = params.hour || p.color;
+	p.minute = params.minute || p.color;
+	p.second = params.second || p.color;
+	p.face = params.face || p.color;
+	p.axis = params.axis || p.fill;
+	p.ticks = {};
+	var pticks = params.ticks || {};
+	for ( var t in pticks)
+		p.ticks[t] = pticks[t];
+	p.ticks.minute = p.ticks.minute || p.color;
+	p.ticks.hour = p.ticks.hour || p.color;
 	if (params.eventColor) {
 		this.ecolor = params.eventColor;
 	} else {
 		this.ecolor = dfh.clockDefaults.eventColor;
 	}
 
-	this.params = params;
+	this.params = p;
 	this.canvas = canvas;
 	this._setDate();
-	this.secondsInDay = 60 * 60 * params.hours;
+	this.secondsInDay = 60 * 60 * p.hours;
 	this.context = canvas.getContext('2d');
 	this.radius = dim / 2 - 2;
 	this.center = {
@@ -166,7 +179,8 @@ dfh.Clock.prototype = {
 		this._clear_prior_events();
 		this._face();
 		this._show_time();
-		this._axis();
+		if (this.params.show.hands)
+			this._axis();
 	},
 
 	_clear_prior_events : function() {
@@ -193,15 +207,25 @@ dfh.Clock.prototype = {
 
 	// draws hands of clock
 	_show_time : function() {
-		var d = new Date();
-		this.date = d;
-		var h = this._hour(d), m = this._minute(d), s = this._second(d);
-		this._radial(-this.length.hour[0], this.length.hour[1],
-				this.width.hour, this.params.hour, h);
-		this._radial(-this.length.minute[0], this.length.minute[1],
-				this.width.minute, this.params.minute, m);
-		this._radial(-this.length.second[0], this.length.second[1],
-				this.width.second, this.params.second, s);
+		this._setDate();
+		var d = this.date;
+		if (this.params.show.hands) {
+			if (this.params.show.hour) {
+				var h = this._hour(d);
+				this._radial(-this.length.hour[0], this.length.hour[1],
+						this.width.hour, this.params.hour, h);
+			}
+			if (this.params.show.minute) {
+				var m = this._minute(d);
+				this._radial(-this.length.minute[0], this.length.minute[1],
+						this.width.minute, this.params.minute, m);
+			}
+			if (this.params.show.second) {
+				var s = this._second(d);
+				this._radial(-this.length.second[0], this.length.second[1],
+						this.width.second, this.params.second, s);
+			}
+		}
 	},
 
 	// draws face of clock -- ticks for hours and minutes
@@ -237,13 +261,21 @@ dfh.Clock.prototype = {
 		// circle around face
 		this.context.stroke();
 		// ticks
-		var length = Math.max(2, this.radius / 20);
-		for ( var i = 0; i < 60; i++)
-			this._radial(length, 0, 1, this.params.ticks.minute, i / 60);
-		length *= 2;
-		for ( var i = 0; i < this.params.hours; i++)
-			this._radial(length, 0, 3, this.params.ticks.hour, i
-					/ this.params.hours);
+		if (this.params.show.ticks) {
+			var length = Math.max(2, this.radius / 20);
+			if (this.params.show.minuteTicks) {
+				for ( var i = 0; i < 60; i++)
+					this
+							._radial(length, 0, 1, this.params.ticks.minute,
+									i / 60);
+			}
+			length *= 2;
+			if (this.params.show.hourTicks) {
+				for ( var i = 0; i < this.params.hours; i++)
+					this._radial(length, 0, 3, this.params.ticks.hour, i
+							/ this.params.hours);
+			}
+		}
 	},
 
 	/**
