@@ -85,6 +85,24 @@
 		canvas.addEventListener('mousedown', function(e) {
 			alert(clock.dateAt(e));
 		}, false);
+		var canvas2 = document.getElementById("test12");
+		var clock2 = new dfh.Clock(canvas2);
+		var d6 = new Date(clock.startTime().getTime() + 2 * 60 * 60 * 1000);
+		var d7 = new Date(d6.getTime() + 60 * 60 * 1000);
+		var e4 = new dfh.Event(d6, d7, {
+			foo : "bar"
+		});
+		var d8 = new Date(d7.getTime() + 2 * 60 * 60 * 1000);
+		var d9 = new Date(d8.getTime() + 60 * 60 * 1000);
+		var e5 = new dfh.Event(d8, d9, {
+			foo : "quux"
+		});
+		clock2.add(e4, e5);
+		canvas2.addEventListener('mousedown', function(e) {
+			var ev = clock2.eventAt(e);
+			if (ev !== undefined)
+				alert(ev.content.foo);
+		}, false);
 	}
 </script>
 <style type="text/css">
@@ -126,5 +144,7 @@ canvas {
 	<canvas id="test10">Damn. Canvas not supported.</canvas>
 	<h2>click clock for date</h2>
 	<canvas id="test11">Damn. Canvas not supported.</canvas>
+	<h2>click clock for event</h2>
+	<canvas id="test12">Damn. Canvas not supported.</canvas>
 </body>
 </html>

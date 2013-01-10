@@ -501,6 +501,30 @@ dfh.Clock.prototype = {
 	},
 
 	/**
+	 * 
+	 * @param x a {Date} or a value suitable as the first parameter of dateAt
+	 * @param y a vertical position in the canvas
+	 * @returns
+	 */
+	eventAt : function(x, y) {
+		var d;
+		if (x.getTime)
+			d = x;
+		else
+			d = this.dateAt(x, y);
+		if (d === undefined)
+			return undefined;
+		for ( var i = 0; i < this.events.length; i++) {
+			var e = this.events[i];
+			if (e.start.getTime() > d.getTime())
+				return undefined;
+			if (e.end === undefined || e.end.getTime() > d.getTime())
+				return e;
+		}
+		return undefined;
+	},
+
+	/**
 	 * Obtains position information for either a co-ordinate relative to the
 	 * canvas or a mouse event.
 	 * 
