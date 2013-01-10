@@ -489,8 +489,8 @@ dfh.Clock.prototype = {
 	dateAt : function(x, y) {
 		if (x.pageX) {
 			var p = dfh.findPos(this.canvas);
-		    y = x.pageY - p.y;
-		    x = x.pageX - p.x;
+			y = x.pageY - p.y;
+			x = x.pageX - p.x;
 		}
 		var pos = this.pos(x, y);
 		if (!pos.on)
@@ -501,6 +501,8 @@ dfh.Clock.prototype = {
 	},
 
 	/**
+	 * Obtains position information for either a co-ordinate relative to the
+	 * canvas or a mouse event.
 	 * 
 	 * @param x
 	 *            horizontal position relative to the canvas or a mouse event
@@ -514,8 +516,8 @@ dfh.Clock.prototype = {
 	pos : function(x, y) {
 		if (x.pageX) {
 			var p = dfh.findPos(this.canvas);
-		    y = x.pageY - p.y;
-		    x = x.pageX - p.x;
+			y = x.pageY - p.y;
+			x = x.pageX - p.x;
 		}
 		y = y - this.center.y;
 		x = x - this.center.x;
