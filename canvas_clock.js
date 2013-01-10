@@ -23,6 +23,12 @@ dfh.clockDefaults = {
 			return 'rgba(0, 125, 125, 0.5)';
 		return 'rgba(255, 0, 0, 0.5)';
 	},
+	shadow : {
+		color : 'rgba(0, 0, 0, 0.5)',
+		x : 2,
+		y : 2,
+		blur : 5,
+	},
 };
 
 /**
@@ -69,13 +75,27 @@ dfh.Clock = function(canvas, params) {
 	} else {
 		this.ecolor = dfh.clockDefaults.eventColor;
 	}
+	this.context = canvas.getContext('2d');
+	var margin = 2;
+	if (params.shadow) {
+		var color = params.shadow.color || dfh.clockDefaults.shadow.color;
+		var x = params.shadow.x || dfh.clockDefaults.shadow.x;
+		var y = params.shadow.y || dfh.clockDefaults.shadow.y;
+		var blur = params.shadow.blur || dfh.clockDefaults.shadow.blur;
+		p.shadow = {
+			"color" : color,
+			"x" : x,
+			"y" : y,
+			"blur" : blur,
+		};
+		margin += Math.max(x, y) + blur;
+	}
 
 	this.params = p;
 	this.canvas = canvas;
 	this._setDate();
 	this.secondsInDay = 60 * 60 * p.hours;
-	this.context = canvas.getContext('2d');
-	this.radius = dim / 2 - 2;
+	this.radius = dim / 2 - margin;
 	this.center = {
 		x : canvas.width / 2,
 		y : canvas.height / 2,
@@ -178,7 +198,7 @@ dfh.Clock.prototype = {
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this._clear_prior_events();
 		this._face();
-		this._show_time();
+		this._showTime();
 		if (this.params.show.hands)
 			this._axis();
 	},
@@ -206,10 +226,12 @@ dfh.Clock.prototype = {
 	},
 
 	// draws hands of clock
-	_show_time : function() {
+	_showTime : function() {
 		this._setDate();
 		var d = this.date;
 		if (this.params.show.hands) {
+			if (this.params.shadow)
+				this._setShadow(2);
 			if (this.params.show.hour) {
 				var h = this._hour(d);
 				this._radial(-this.length.hour[0], this.length.hour[1],
@@ -225,6 +247,8 @@ dfh.Clock.prototype = {
 				this._radial(-this.length.second[0], this.length.second[1],
 						this.width.second, this.params.second, s);
 			}
+			if (this.params.shadow)
+				this.context.restore();
 		}
 	},
 
@@ -237,7 +261,11 @@ dfh.Clock.prototype = {
 		this.context.arc(this.center.x, this.center.y, this.radius, 0,
 				2 * Math.PI, false);
 		this.context.fillStyle = this.params.fill;
+		if (this.params.shadow)
+			this._setShadow();
 		this.context.fill();
+		if (this.params.shadow)
+			this.context.restore();
 		// events
 		if (this.events.length) {
 			var drawn = false;
@@ -276,6 +304,17 @@ dfh.Clock.prototype = {
 							/ this.params.hours);
 			}
 		}
+	},
+
+	_setShadow : function(reduction) {
+		reduction = reduction || 1;
+		if (reduction < 1)
+			Error("shadow reduction factor cannot be less than 1");
+		this.context.save();
+		this.context.shadowColor = this.params.shadow.color;
+		this.context.shadowBlur = this.params.shadow.blur / reduction;
+		this.context.shadowOffsetX = this.params.shadow.x / reduction;
+		this.context.shadowOffsetY = this.params.shadow.y / reduction;
 	},
 
 	/**

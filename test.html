@@ -76,6 +76,10 @@
 			noMinuteTicks : true,
 		});
 		clock.add(e1, e2, e3);
+		canvas = document.getElementById("test10");
+		new dfh.Clock(canvas, {
+			shadow : true
+		});
 	}
 </script>
 <style type="text/css">
@@ -113,5 +117,7 @@ canvas {
 	<canvas id="test8">Damn. Canvas not supported.</canvas>
 	<h2>clock showing events without second hand or minute ticks</h2>
 	<canvas id="test9">Damn. Canvas not supported.</canvas>
+	<h2>clock with shadow</h2>
+	<canvas id="test10">Damn. Canvas not supported.</canvas>
 </body>
 </html>
