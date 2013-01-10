@@ -80,6 +80,11 @@
 		new dfh.Clock(canvas, {
 			shadow : true
 		});
+		canvas = document.getElementById("test11");
+		clock = new dfh.Clock(canvas);
+		canvas.addEventListener('mousedown', function(e) {
+			alert(clock.dateAt(e));
+		}, false);
 	}
 </script>
 <style type="text/css">
@@ -119,5 +124,7 @@ canvas {
 	<canvas id="test9">Damn. Canvas not supported.</canvas>
 	<h2>clock with shadow</h2>
 	<canvas id="test10">Damn. Canvas not supported.</canvas>
+	<h2>click clock for date</h2>
+	<canvas id="test11">Damn. Canvas not supported.</canvas>
 </body>
 </html>

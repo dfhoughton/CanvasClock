@@ -32,6 +32,24 @@ dfh.clockDefaults = {
 };
 
 /**
+ * Function that finds the page position of an element.
+ */
+dfh.findPos = function(obj) {
+	var curleft = 0, curtop = 0;
+	if (obj.offsetParent) {
+		do {
+			curleft += obj.offsetLeft;
+			curtop += obj.offsetTop;
+		} while (obj = obj.offsetParent);
+		return {
+			x : curleft,
+			y : curtop
+		};
+	}
+	return undefined;
+};
+
+/**
  * Constructor function for clocks.
  */
 dfh.Clock = function(canvas, params) {
@@ -456,6 +474,83 @@ dfh.Clock.prototype = {
 			d.setHours(11, 59, 59, 999);
 			return d;
 		}
+	},
+
+	/**
+	 * Converts a location on the clock face to the corresponding time.
+	 * 
+	 * @param x
+	 *            horizontal canvas coordinate
+	 * @param y
+	 *            vertical canvas coordinate
+	 * @returns {Date} corresponding to this point on the clock face, or
+	 *          undefined if the given position is not on the clock face
+	 */
+	dateAt : function(x, y) {
+		if (x.pageX) {
+			var p = dfh.findPos(this.canvas);
+		    y = x.pageY - p.y;
+		    x = x.pageX - p.x;
+		}
+		var pos = this.pos(x, y);
+		if (!pos.on)
+			return undefined;
+		var m = this.secondsInDay * pos.tau * 1000;
+		m += this.startSecond;
+		return new Date(m);
+	},
+
+	/**
+	 * 
+	 * @param x
+	 *            horizontal position relative to the canvas or a mouse event
+	 * @param y
+	 *            vertical position relative to the canvas
+	 * @returns object with keys x, y, on, tau; the first two are co-ordinates
+	 *          relative to the axis of the clock; on specifies whether this
+	 *          point is on the clock face; tau is the rotation around the face
+	 *          from the 0 position (noon on a 12 hour clock)
+	 */
+	pos : function(x, y) {
+		if (x.pageX) {
+			var p = dfh.findPos(this.canvas);
+		    y = x.pageY - p.y;
+		    x = x.pageX - p.x;
+		}
+		y = y - this.center.y;
+		x = x - this.center.x;
+		var tau;
+		if (y < 0) {
+			if (x < 0) {
+				tau = Math.atan(-y / -x) / (Math.PI * 2) + .75;
+			} else if (x == 0) {
+				tau = 0;
+			} else {
+				tau = .25 - Math.atan(-y / x) / (Math.PI * 2);
+			}
+		} else if (y == 0) {
+			if (x < 0) {
+				tau = .75;
+			} else if (x == 0) {
+				tau = 0;
+			} else {
+				tau = .25;
+			}
+		} else {
+			if (x < 0) {
+				tau = .75 - Math.atan(y / -x) / (Math.PI * 2);
+			} else if (x == 0) {
+				tau = .5;
+			} else {
+				tau = .25 + Math.atan(y / x) / (Math.PI * 2);
+			}
+		}
+		return {
+			"x" : x,
+			"y" : y,
+			"tau" : tau,
+			on : x * x + y * y <= this.radius * this.radius
+		};
 	}
 };
 
