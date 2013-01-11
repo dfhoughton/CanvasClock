@@ -502,8 +502,10 @@ dfh.Clock.prototype = {
 
 	/**
 	 * 
-	 * @param x a {Date} or a value suitable as the first parameter of dateAt
-	 * @param y a vertical position in the canvas
+	 * @param x
+	 *            a {Date} or a value suitable as the first parameter of dateAt
+	 * @param y
+	 *            a vertical position in the canvas
 	 * @returns
 	 */
 	eventAt : function(x, y) {
@@ -645,11 +647,20 @@ dfh.Event.prototype = {
 	 */
 	displayable : function(clock) {
 		var s1 = this.start.getTime();
-		if (s1 > clock.date.getTime())
+		if (s1 > clock.endSecond)
 			return false;
 		if (this.end === undefined)
 			return true;
 		var s2 = this.end.getTime();
 		return s2 > clock.startSecond;
 	},
+
+	/**
+	 * Whether this task's end is as yet undefined.
+	 * 
+	 * @returns {Boolean} whether this event does not yet have a defined end
+	 */
+	isOpen : function() {
+		return this.end === undefined;
+	}
 };

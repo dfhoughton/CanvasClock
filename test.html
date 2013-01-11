@@ -100,7 +100,7 @@
 		clock2.add(e4, e5);
 		canvas2.addEventListener('mousedown', function(e) {
 			var ev = clock2.eventAt(e);
-			if (ev !== undefined)
+			if (ev !== undefined && ev.displayable(clock2))
 				alert(ev.content.foo);
 		}, false);
 	}
